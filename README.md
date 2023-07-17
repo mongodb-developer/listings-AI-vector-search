@@ -1,6 +1,6 @@
 # Listings AI vector search demo
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a small web application to show case [Atlas Vector search](https://www.mongodb.com/products/platform/atlas-vector-search) with GPT-4 filter building out of free text search.
 
 ## Recommended IDE Setup
 
