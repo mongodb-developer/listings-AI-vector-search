@@ -1,43 +1,64 @@
 <template>
   <div>
-    <div class="search-area">
+  <div class="search-area">
+      <div class="search-text">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search for accommodations..."
         class="search-input"
       />
-      <input
-        v-model.number="filterBeds"
-        type="text"
-        placeholder="Text for Beds"
-        class="filter-input"
-      />
-      <input
-        v-model.number="filterRooms"
-        type="text"
-        placeholder="Text for Rooms"
-        class="filter-input"
-      />
-      <input
-        v-model.number="filterPeople"
-        type="text"
-        placeholder="Text for People"
-        class="filter-input"
-      />
-      <div class="filter-container">
-        <label class="filter-label">Max Price:</label>
-        <input
-          type="range"
-          v-model="filterMaxPrice"
-          :min="15"
-          :max="10000"
-          class="range-input"
-        />
-        <span class="range-value">{{ filterMaxPrice }}</span>
-      </div>
+      
       <button @click="fetchListings" class="search-button">Search</button>
+      </div>
+      <div class="filters">
+  <!-- Show the free text input field only when the toggle is ON -->
+  <div v-if="useFreeTextFilter" class="free-text-filter">
+    <label for="freeTextFilter">Free Text Filter:</label>
+    <input
+      type="text"
+      class="free-filter"
+
+      v-model="freeTextFilter"
+      placeholder="Free text filter eg. 'No more than 4 beds'..."
+    />
+  </div>
+
+  <!-- Show the range inputs only when the toggle is OFF -->
+  <div v-if="!useFreeTextFilter" class="ranges">
+    <div class="bedrooms-range">
+      <label for="bedrooms">Beds:</label>
+      <input
+        type="range"
+        id="bedrooms"
+        v-model="filterBeds"
+        min="1"
+        max="10"
+      />
+      <span>{{ filterBeds }}</span>
     </div>
+    <div class="rooms-range">
+      <label for="rooms">Rooms:</label>
+      <input
+        type="range"
+        id="rooms"
+        v-model="filterRooms"
+        min="1"
+        max="10"
+      />
+      <span>{{ filterRooms }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="toggle-container">
+  <label for="toggleFilter">Free text:</label>
+  <input type="checkbox" id="toggleFilter" v-model="useFreeTextFilter" />
+</div>
+
+
+  
+</div>
     <div v-if="listings.length<1" ><h1>No Apartments</h1></div>
     <div v-else="listings.length>0" class="grid" :class="{ 'grid-disabled': loading }">
       
@@ -63,6 +84,7 @@
 
 <script>
 import axios from 'axios';
+import RangeSlider from 'vue-range-slider';
 
 export default {
   data() {
@@ -75,13 +97,14 @@ export default {
       loading: false,
       showMore: {},
       filterMaxPrice: 10000,
+      useFreeTextFilter: false,
+      freeTextFilter: '',
     }
   },
   mounted() {
     this.fetchListings();
   },
   methods: {
-    // TODO: Replace <APP_SERVICES_HTTP_GET_ENDPOINT> with the relevant endpoint
     async fetchListings() {
       try {
         this.loading = true;
@@ -92,8 +115,19 @@ export default {
           people: this.filterPeople,
           // maxPrice: this.filterMaxPrice,
         };
+
+        if (this.useFreeTextFilter) {
+          this.filterBeds = '';
+          this.filterRooms = '';
+          this.filterPeople = '';
+      params.freeTextFilter = this.freeTextFilter;
+    }
+        /*
+          TODO: REPLACE WITH YOURS
+          <ENDPOINT_APP_SERVICES> is the endpoint of your app services
+        */
         const response = await axios.get(
-          '<APP_SERVICES_HTTP_GET_ENDPOINT>',
+          '<ENDPOINT_APP_SERVICES>',
           { params }
         );
         this.loading = false;
@@ -114,6 +148,9 @@ export default {
         return description;
       }
     },
+    toggleFreeTextFilter() {
+    this.useFreeTextFilter = !this.useFreeTextFilter;
+  },
     toggleShowMore(id) {
       this.showMore[id] = !this.showMore[id];
     },
@@ -130,10 +167,15 @@ export default {
 
 .search-area {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   gap: 10px;
+}
+.search-text{
+  flex-direction: row;
+  width: 100%;
 }
 
 .search-input {
@@ -178,5 +220,19 @@ export default {
     opacity: 1;
     backdrop-filter: blur(50px); 
   }
+}
+
+.filters {
+  display: flex;
+
+  width: 100%;
+  gap: 10px;
+}
+
+.free-filter{
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 500px
 }
 </style>
