@@ -17,6 +17,20 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 Build the relevent API endpoints and point the front end applicaiton to it:
 
+`src/App.vue`:
+```
+  /*
+          TODO: REPLACE WITH YOURS
+          <ENDPOINT_APP_SERVICES> is the endpoint of your app services
+        */
+        const response = await axios.get(
+          '<ENDPOINT_APP_SERVICES>',
+          { params }
+        );
+```
+
+### Install
+
 
 ```sh
 npm install
